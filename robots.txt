@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ponsanmugavishalportfolio.vercel.app/sitemap.xml
