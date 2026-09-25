@@ -24,6 +24,7 @@ const jetbrains = localFont({
   variable: "--font-jetbrains",
   weight: "100 800",
   display: "swap",
+  preload: false, // only used for small labels, so it doesn't need to block the first paint
 });
 
 const description =

@@ -222,8 +222,8 @@ export default function Hero() {
             </h1>
 
             <p
-              className="enter-fade mt-6 max-w-xl text-[17px] leading-relaxed text-muted sm:text-lg"
-              style={{ "--d": "0.55s" }}
+              className="enter-lift mt-6 max-w-xl text-[17px] leading-relaxed text-muted sm:text-lg"
+              style={{ "--d": "0.2s" }}
             >
               {site.heroIntro}
             </p>

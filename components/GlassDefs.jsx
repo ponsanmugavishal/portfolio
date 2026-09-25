@@ -9,7 +9,7 @@ export default function GlassDefs() {
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
         <filter id="liquid-glass" x="0" y="0" width="100%" height="100%">
           <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
         </filter>
         {/* Gentler version for thin surfaces like the navbar */}
         <filter id="liquid-glass-soft" x="0" y="0" width="100%" height="100%">

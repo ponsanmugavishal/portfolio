@@ -6,6 +6,7 @@ import {
   BookOpen, BriefcaseBusiness, Code2, Database, Dumbbell, Headphones, Mail, Sparkles, Terminal, Wrench,
 } from "lucide-react";
 import { duration, ease, viewport } from "@/lib/motion";
+import useGlassShine from "@/lib/useGlassShine";
 
 // Icon names used in lib/site.js → lucide icons (generic icons only, no brand logos)
 export const icons = {
@@ -70,8 +71,10 @@ export function Magnetic({ children, className = "", strength = 0.3, ...props })
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 200, damping: 15, mass: 0.2 });
   const sy = useSpring(y, { stiffness: 200, damping: 15, mass: 0.2 });
+  const shine = useGlassShine();
 
   const onMove = (e) => {
+    shine(e);
     if (reduce || e.pointerType !== "mouse") return;
     const r = ref.current?.getBoundingClientRect();
     if (!r) return;
