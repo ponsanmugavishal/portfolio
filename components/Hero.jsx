@@ -3,36 +3,46 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
-  AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform,
+  AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform,
 } from "motion/react";
 import { ArrowRight, Download, GraduationCap, MapPin } from "lucide-react";
-import { site } from "@/lib/site";
-import { icons, Magnetic } from "./ui";
+import { site, stats } from "@/lib/site";
+import { ease } from "@/lib/motion";
+import useIsDesktop from "@/lib/useIsDesktop";
+import { icons, Magnetic, Reveal, StatusDot } from "./ui";
 
-const words = ["AI workflows.", "web apps.", "Java backends.", "things that help people."];
-const chips = [
-  { label: "Python", pos: "left-[2%] top-[16%]", depth: 38, float: 5.5 },
-  { label: "Java", pos: "right-[0%] top-[30%]", depth: 52, float: 6.5 },
-  { label: "MySQL", pos: "left-[-4%] top-[56%]", depth: 28, float: 7 },
-  { label: "LLM APIs", pos: "right-[4%] top-[68%]", depth: 44, float: 6 },
+// Floating glass chips around the photo: position + parallax depth + float speed
+const chipLayout = [
+  { pos: "left-[-6%] top-[14%]", depth: 34, float: 5.5 },
+  { pos: "right-[-8%] top-[30%]", depth: 48, float: 6.5 },
+  { pos: "left-[-10%] top-[56%]", depth: 26, float: 7 },
+  { pos: "right-[-6%] top-[70%]", depth: 42, float: 6 },
 ];
 
-function RotatingWord() {
+// The rotating last word. Its size is capped (.hero-rotating) so the longest phrase
+// fits on one line, and invisible copies reserve its width — no layout jumps.
+function RotatingWord({ words }) {
   const [i, setI] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % words.length), 2600);
     return () => clearInterval(t);
-  }, []);
+  }, [words.length]);
+
   return (
-    <span className="relative inline-grid overflow-hidden align-bottom">
-      <AnimatePresence mode="popLayout" initial={false}>
+    <span aria-hidden className="relative grid overflow-hidden whitespace-nowrap pb-[0.12em]">
+      {words.map((w) => (
+        <span key={w} className="invisible col-start-1 row-start-1">
+          {w}
+        </span>
+      ))}
+      <AnimatePresence initial={false}>
         <motion.span
           key={words[i]}
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: "0%", opacity: 1 }}
-          exit={{ y: "-100%", opacity: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="text-gradient col-start-1 row-start-1 whitespace-nowrap pb-2"
+          initial={{ y: "105%" }}
+          animate={{ y: "0%" }}
+          exit={{ y: "-105%" }}
+          transition={{ duration: 0.6, ease }}
+          className="text-gradient col-start-1 row-start-1 self-start"
         >
           {words[i]}
         </motion.span>
@@ -47,36 +57,126 @@ function Chip({ label, pos, depth, float, mx, my }) {
   return (
     <motion.div style={{ x, y }} className={`absolute z-20 ${pos}`}>
       <motion.div
-        animate={{ y: [0, -12, 0] }}
+        animate={{ y: [0, -10, 0] }}
         transition={{ duration: float, repeat: Infinity, ease: "easeInOut" }}
-        className="rounded-full border border-line-strong bg-ink/70 px-4 py-2 font-mono text-xs text-cream shadow-xl shadow-black/40 backdrop-blur-md"
+        className="glass-pill flex items-center gap-2 px-3 py-1.5 font-mono text-[11px] text-fg sm:px-4 sm:py-2 sm:text-xs"
       >
-        <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-accent align-middle" />
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
         {label}
       </motion.div>
     </motion.div>
   );
 }
 
+function PhotoStage({ mx, my, scrollYProgress }) {
+  const desktop = useIsDesktop();
+  const reduce = useReducedMotion();
+  // Gentle scroll parallax: smaller on phones so the photo never slides into the stats strip
+  const stageY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : desktop ? 110 : 24]);
+  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
+  const orbX = useTransform(mx, (v) => v * 10);
+  const orbY = useTransform(my, (v) => v * 10);
+  const photoX = useTransform(mx, (v) => v * -14);
+  const photoY = useTransform(my, (v) => v * -8);
+
+  return (
+    <motion.div
+      style={{ y: stageY, scale: stageScale }}
+      className="relative mx-auto mt-6 w-full max-w-[290px] sm:max-w-[360px] lg:mt-0 lg:max-w-[450px]"
+    >
+      <div className="enter-scale relative aspect-[900/873] w-full" style={{ "--d": "0.15s" }}>
+        {/* Glass orb with an aurora inside */}
+        <motion.div
+          style={{ x: orbX, y: orbY }}
+          className="glass glass-refract absolute inset-x-0 bottom-0 top-[28%] overflow-hidden rounded-[50%_50%_3rem_3rem/42%_42%_3rem_3rem]"
+        >
+          <div aria-hidden className="orb-fill absolute inset-0" />
+        </motion.div>
+
+        {/* Cut-out photo: clipped to the orb at the sides/bottom, head pops out of the top */}
+        <motion.div
+          style={{ x: photoX, y: photoY }}
+          className="absolute inset-0 z-10 [clip-path:inset(-20%_0_0_0_round_0_0_3rem_3rem)]"
+        >
+          <Image
+            src={site.photo}
+            alt={`Portrait of ${site.name}`}
+            fill
+            preload
+            sizes="(max-width: 640px) 290px, (max-width: 1024px) 360px, 450px"
+            className="object-contain object-bottom"
+          />
+        </motion.div>
+
+        {site.heroChips.map((label, i) => (
+          <Chip key={label} label={label} {...chipLayout[i % chipLayout.length]} mx={mx} my={my} />
+        ))}
+
+        {/* Info cards */}
+        <div
+          className="glass enter-fade absolute bottom-[5%] left-[-8%] z-20 flex items-center gap-3 !rounded-[20px] p-2.5 pr-4 sm:left-[-14%] sm:p-3 sm:pr-5"
+          style={{ "--d": "0.9s" }}
+        >
+          <span className="btn-gradient grid h-9 w-9 place-items-center rounded-xl sm:h-10 sm:w-10">
+            <GraduationCap size={19} aria-hidden />
+          </span>
+          <span className="text-left leading-tight">
+            <span className="block text-sm font-semibold text-fg">{site.degree}</span>
+            <span className="mt-0.5 block text-xs text-muted">
+              {site.collegeShort} · {site.batch}
+            </span>
+          </span>
+        </div>
+        <div
+          className="glass-pill enter-fade absolute right-[-4%] top-[-2%] z-20 flex items-center gap-2 px-3.5 py-2 text-xs text-fg sm:right-[-10%]"
+          style={{ "--d": "1s" }}
+        >
+          <MapPin size={14} className="text-accent" aria-hidden /> {site.city}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function StatsStrip() {
+  return (
+    <div className="container-page relative z-10">
+      <Reveal>
+        <dl className="glass grid grid-cols-2 md:grid-cols-4">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex flex-col-reverse gap-1 p-5 sm:p-7 ${i % 2 === 1 ? "border-l border-line" : ""} ${
+                i >= 2 ? "border-t border-line md:border-t-0" : ""
+              } ${i === 2 ? "md:border-l" : ""}`}
+            >
+              <dt className="text-sm text-muted">{s.label}</dt>
+              <dd className="flex items-center gap-2.5 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+                {s.value}
+                {s.live && <StatusDot size={9} />}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Reveal>
+    </div>
+  );
+}
+
 export default function Hero() {
   const ref = useRef(null);
+  const reduce = useReducedMotion();
   const mxRaw = useMotionValue(0);
   const myRaw = useMotionValue(0);
   const mx = useSpring(mxRaw, { stiffness: 60, damping: 18 });
   const my = useSpring(myRaw, { stiffness: 60, damping: 18 });
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const photoY = useTransform(scrollYProgress, [0, 1], [0, 140]);
-  const photoScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
-  const textY = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-
-  const photoX = useTransform(mx, (v) => v * -18);
-  const photoMY = useTransform(my, (v) => v * -12);
-  const ringX = useTransform(mx, (v) => v * 30);
-  const ringY = useTransform(my, (v) => v * 30);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -70]);
+  const fade = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   const onMove = (e) => {
+    if (reduce || e.pointerType !== "mouse") return;
     const r = ref.current?.getBoundingClientRect();
     if (!r) return;
     mxRaw.set((e.clientX - r.left) / r.width - 0.5);
@@ -86,214 +186,111 @@ export default function Hero() {
   const socials = site.socials.filter((s) => s.url);
 
   return (
-    <section
-      id="top"
-      ref={ref}
-      onPointerMove={onMove}
-      className="relative flex min-h-[100svh] items-center overflow-hidden pb-20 pt-32 md:pt-28"
-    >
-      {/* Background */}
-      <div aria-hidden className="absolute inset-0 -z-10">
-        <div className="bg-grid absolute inset-0" />
-        <div className="animate-blob absolute -right-32 top-10 h-[520px] w-[520px] rounded-full bg-accent/25 blur-[120px]" />
-        <div className="animate-blob absolute right-40 top-64 h-[360px] w-[360px] rounded-full bg-accent-2/15 blur-[110px] [animation-delay:-6s]" />
-        <div className="animate-blob absolute -left-40 bottom-0 h-[460px] w-[460px] rounded-full bg-plum/25 blur-[130px] [animation-delay:-11s]" />
-      </div>
-
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 px-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">
-        {/* Text */}
-        <motion.div style={{ y: textY, opacity: fade }} className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-line bg-white/[0.03] px-3.5 py-1.5 text-xs text-muted backdrop-blur"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-accent" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-            </span>
-            {site.status}
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.6 }}
-            className="mb-4 font-mono text-xs uppercase tracking-[0.3em] text-faint"
-          >
-            {site.name}
-          </motion.p>
-
-          <h1 className="font-display text-[2.6rem] font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-[4.6rem]">
-            {["Hi, I'm Vishal.", "I build"].map((line, li) => (
-              <span key={line} className="block overflow-hidden pb-1">
-                <motion.span
-                  className="block"
-                  initial={{ y: "110%" }}
-                  animate={{ y: "0%" }}
-                  transition={{ delay: 0.2 + li * 0.12, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {line}
-                </motion.span>
-              </span>
-            ))}
-            <motion.span
-              className="block"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
+    <section id="top" className="relative overflow-x-clip pb-8">
+      <div ref={ref} onPointerMove={onMove} className="relative flex min-h-[100svh] items-center pb-20 pt-28 lg:pb-16 lg:pt-24">
+        <div className="container-page grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:gap-8">
+          {/* Text */}
+          <motion.div style={{ y: textY, opacity: fade }} className="hero-text relative z-10 min-w-0">
+            <div
+              className="glass-pill enter-fade mb-6 inline-flex items-center gap-2.5 px-4 py-2 text-sm text-fg"
+              style={{ "--d": "0s" }}
             >
-              <RotatingWord />
-            </motion.span>
-          </h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.7 }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg"
-          >
-            ECE student at M. Kumarasamy College of Engineering, turning ideas into working software with
-            Python, Java and MySQL — and currently looking for an internship.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85, duration: 0.7 }}
-            className="mt-9 flex flex-wrap items-center gap-3"
-          >
-            <Magnetic
-              href="#projects"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 font-medium text-ink shadow-[0_10px_40px_-10px_rgba(255,106,61,0.7)] transition-colors hover:bg-accent-2"
-            >
-              View my work
-              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </Magnetic>
-            <Magnetic
-              href={site.resume}
-              download
-              className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3.5 font-medium text-cream transition-colors hover:border-cream/40 hover:bg-white/5"
-            >
-              <Download size={17} /> Download resume
-            </Magnetic>
-          </motion.div>
-
-          <motion.ul
-            initial="hidden"
-            animate="show"
-            variants={{ show: { transition: { staggerChildren: 0.08, delayChildren: 1 } } }}
-            className="mt-9 flex items-center gap-3"
-          >
-            {socials.map((s) => {
-              const Icon = icons[s.icon];
-              return (
-                <motion.li key={s.label} variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}>
-                  <a
-                    href={s.url}
-                    target={s.url.startsWith("http") ? "_blank" : undefined}
-                    rel="noreferrer"
-                    aria-label={s.label}
-                    className="group relative grid h-11 w-11 place-items-center rounded-full border border-line text-muted transition hover:-translate-y-1 hover:border-accent/60 hover:text-accent"
-                  >
-                    <Icon size={18} />
-                    <span className="pointer-events-none absolute -bottom-8 whitespace-nowrap rounded-md bg-surface-2 px-2 py-1 text-[11px] text-cream opacity-0 transition group-hover:opacity-100">
-                      {s.label}
-                    </span>
-                  </a>
-                </motion.li>
-              );
-            })}
-          </motion.ul>
-        </motion.div>
-
-        {/* Photo stage */}
-        <motion.div style={{ y: photoY, scale: photoScale }} className="relative mx-auto w-full max-w-[420px]">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="relative aspect-[4/5] w-full"
-        >
-          {/* glowing disc */}
-          <motion.div
-            style={{ x: ringX, y: ringY }}
-            className="absolute inset-x-[6%] top-[8%] aspect-square rounded-full bg-gradient-to-br from-accent via-accent-2/80 to-plum opacity-90 shadow-[0_0_120px_20px_rgba(255,106,61,0.25)]"
-          />
-          {/* rotating text ring */}
-          <motion.div style={{ x: ringX, y: ringY }} className="absolute inset-x-[-2%] top-[0%] aspect-square">
-            <svg viewBox="0 0 200 200" className="animate-spin-slow h-full w-full">
-              <defs>
-                <path id="ring" d="M100,100 m-88,0 a88,88 0 1,1 176,0 a88,88 0 1,1 -176,0" />
-              </defs>
-              <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(243,240,232,0.14)" strokeDasharray="2 6" />
-              <text className="fill-cream/50 font-mono" fontSize="7.2" letterSpacing="3.2">
-                <textPath href="#ring">SOFTWARE DEVELOPER · ECE STUDENT · PYTHON · JAVA · MYSQL · </textPath>
-              </text>
-            </svg>
-          </motion.div>
-
-          {/* photo */}
-          <motion.div style={{ x: photoX, y: photoMY }} className="absolute inset-x-0 bottom-0 top-[4%] z-10">
-            <div className="relative h-full w-full [mask-image:linear-gradient(to_bottom,black_78%,transparent)]">
-              <Image
-                src={site.photo}
-                alt={`Portrait of ${site.name}`}
-                fill
-                priority
-                sizes="(max-width: 1024px) 80vw, 420px"
-                className="object-contain object-bottom drop-shadow-[0_30px_40px_rgba(0,0,0,0.55)]"
-              />
+              <StatusDot size={8} />
+              {site.status}
             </div>
+
+            <p className="text-label enter-fade mb-4 text-faint" style={{ "--d": "0.08s" }}>
+              {site.name}
+            </p>
+
+            <h1 className="text-display text-fg">
+              <span className="sr-only">
+                Hi, I&apos;m {site.shortName}. I build {site.heroWords.join(" ")}
+              </span>
+              <span aria-hidden className="block">
+                {["Hi, I'm Vishal.", "I build"].map((line, li) => (
+                  <span key={line} className="block overflow-hidden pb-[0.06em]">
+                    <span className="enter-rise block" style={{ "--d": `${0.12 + li * 0.1}s` }}>
+                      {line}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              <span className="hero-rotating enter-fade block" style={{ "--d": "0.45s" }}>
+                <RotatingWord words={site.heroWords} />
+              </span>
+            </h1>
+
+            <p
+              className="enter-lift mt-6 max-w-xl text-[17px] leading-relaxed text-muted sm:text-lg"
+              style={{ "--d": "0.2s" }}
+            >
+              {site.heroIntro}
+            </p>
+
+            <div className="enter-fade mt-9 flex flex-wrap items-center gap-3" style={{ "--d": "0.65s" }}>
+              <Magnetic
+                href="#projects"
+                className="btn-gradient group inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-medium"
+              >
+                View my work
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" aria-hidden />
+              </Magnetic>
+              <Magnetic
+                href={site.resume}
+                download
+                className="glass-pill glass-interactive inline-flex items-center gap-2 px-6 py-3.5 font-medium text-fg"
+              >
+                <Download size={17} aria-hidden /> Download resume
+              </Magnetic>
+            </div>
+
+            <ul className="enter-fade mt-8 flex items-center gap-3" style={{ "--d": "0.75s" }}>
+              {socials.map((s) => {
+                const Icon = icons[s.icon];
+                const external = s.url.startsWith("http");
+                return (
+                  <li key={s.label}>
+                    <a
+                      href={s.url}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noreferrer" : undefined}
+                      aria-label={s.label}
+                      className="glass-pill group relative grid h-11 w-11 place-items-center text-muted transition hover:-translate-y-1 hover:text-accent"
+                    >
+                      <Icon size={18} aria-hidden />
+                      <span className="pointer-events-none absolute -bottom-9 whitespace-nowrap rounded-lg bg-fg px-2 py-1 text-[11px] text-page opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                        {s.label}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </motion.div>
 
-          {chips.map((c) => (
-            <Chip key={c.label} {...c} mx={mx} my={my} />
-          ))}
+          <PhotoStage mx={mx} my={my} scrollYProgress={scrollYProgress} />
+        </div>
 
-          {/* info cards */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.1, duration: 0.7 }}
-            className="absolute -left-4 bottom-[9%] z-20 flex items-center gap-3 rounded-2xl border border-line-strong bg-ink/75 p-3 pr-4 shadow-2xl shadow-black/50 backdrop-blur-md sm:-left-10"
-          >
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/15 text-accent">
-              <GraduationCap size={20} />
-            </span>
-            <span className="text-left">
-              <span className="block text-sm font-semibold text-cream">B.E. ECE</span>
-              <span className="block text-xs text-muted">MKCE · 2024–2028</span>
-            </span>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.25, duration: 0.7 }}
-            className="absolute -right-2 top-[6%] z-20 flex items-center gap-2 rounded-full border border-line-strong bg-ink/75 px-3.5 py-2 text-xs text-cream shadow-xl shadow-black/40 backdrop-blur-md sm:-right-6"
-          >
-            <MapPin size={14} className="text-accent" /> Namakkal, Tamil Nadu
-          </motion.div>
-        </motion.div>
-        </motion.div>
+        {/* Scroll cue (desktop) */}
+        <motion.a
+          href="#about"
+          style={{ opacity: fade }}
+          aria-label="Scroll to About"
+          className="text-label absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 !text-[11px] text-faint lg:flex"
+        >
+          Scroll
+          <span aria-hidden className="relative h-10 w-px overflow-hidden bg-line-strong">
+            <motion.span
+              className="absolute left-0 top-0 h-4 w-px bg-gradient-to-b from-accent to-accent-2"
+              animate={{ y: [-16, 40] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </span>
+        </motion.a>
       </div>
 
-      {/* scroll cue */}
-      <motion.a
-        href="#about"
-        style={{ opacity: fade }}
-        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-faint md:flex"
-      >
-        Scroll
-        <span className="relative h-10 w-px overflow-hidden bg-line-strong">
-          <motion.span
-            className="absolute left-0 top-0 h-4 w-px bg-accent"
-            animate={{ y: [-16, 40] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </span>
-      </motion.a>
+      <StatsStrip />
     </section>
   );
 }

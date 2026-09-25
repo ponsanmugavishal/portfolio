@@ -1,149 +1,260 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
-import { Download, Menu, X } from "lucide-react";
-import { site } from "@/lib/site";
+import { useLenis } from "lenis/react";
+import { Download, Menu, Search, X } from "lucide-react";
+import { nav, site } from "@/lib/site";
+import { ease, spring, stagger } from "@/lib/motion";
+import ThemeToggle from "./ThemeToggle";
+import { OPEN_EVENT } from "./CommandPalette";
 
-const links = [
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
-  { href: "#github", label: "GitHub" },
-  { href: "#education", label: "Education" },
-  { href: "#contact", label: "Contact" },
-];
+function Logo() {
+  return (
+    <a href="#top" className="group flex items-center gap-2.5 rounded-full" aria-label={`${site.shortName} — back to top`}>
+      <span className="btn-gradient grid h-9 w-9 place-items-center rounded-full font-display text-sm font-bold transition-transform duration-500 group-hover:rotate-[360deg]">
+        PV
+      </span>
+      <span className="hidden font-display text-[15px] font-semibold tracking-tight text-fg sm:block">
+        {site.shortName}
+        <span className="text-accent">.</span>
+      </span>
+    </a>
+  );
+}
+
+// Full-screen glass sheet for phones and tablets. Rendered into <body> so no
+// transformed parent can shrink it.
+function MobileMenu({ open, onClose, active }) {
+  const sheetRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const sheet = sheetRef.current;
+    sheet?.querySelector("a")?.focus();
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key !== "Tab" || !sheet) return;
+      // keep keyboard focus inside the menu while it's open
+      const items = sheet.querySelectorAll("a, button");
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          ref={sheetRef}
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease }}
+          className="glass-strong fixed inset-0 z-[80] flex flex-col overflow-y-auto rounded-none px-6 pb-10 pt-6 lg:hidden"
+        >
+          <div className="flex items-center justify-between">
+            <Logo />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                type="button"
+                onClick={onClose}
+                className="glass-pill grid h-10 w-10 place-items-center text-fg"
+                aria-label="Close menu"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+
+          <ul className="mt-auto space-y-1 pt-10">
+            {nav.map((l, i) => (
+              <motion.li
+                key={l.href}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 + i * stagger, duration: 0.5, ease }}
+              >
+                <a
+                  href={l.href}
+                  onClick={onClose}
+                  aria-current={active === l.href.slice(1) ? "true" : undefined}
+                  className={`flex items-baseline gap-4 rounded-2xl py-2 font-display text-[2.6rem] font-semibold leading-tight tracking-tight ${
+                    active === l.href.slice(1) ? "text-accent" : "text-fg"
+                  }`}
+                >
+                  <span className="font-mono text-sm font-normal text-faint">0{i + 1}</span>
+                  {l.label}
+                </a>
+              </motion.li>
+            ))}
+          </ul>
+
+          <motion.a
+            href={site.resume}
+            download
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + nav.length * stagger, duration: 0.5, ease }}
+            className="btn-gradient mb-auto mt-10 inline-flex w-fit items-center gap-2 rounded-full px-6 py-3.5 font-medium"
+          >
+            <Download size={17} /> Download resume
+          </motion.a>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
 
 export default function Navbar() {
   const { scrollY } = useScroll();
+  const lenis = useLenis();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [isMac, setIsMac] = useState(false);
+  const menuBtn = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+    setIsMac(/mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || ""));
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
     setScrolled(y > 24);
-    setHidden(y > prev && y > 400 && !open);
+    setHidden(y > prev && y > 400);
   });
 
-  // Highlight the section currently on screen
+  // Highlight the section currently in the middle of the screen
   useEffect(() => {
-    const ids = links.map((l) => l.href.slice(1));
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: "-45% 0px -50% 0px" }
     );
-    ids.forEach((id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
+    ["top", ...nav.map((l) => l.href.slice(1))].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
     return () => obs.disconnect();
   }, []);
 
+  // Lock page scroll while the mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-  }, [open]);
+    if (!open) return;
+    lenis?.stop();
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      lenis?.start();
+      document.documentElement.style.overflow = "";
+    };
+  }, [open, lenis]);
+
+  const closeMenu = () => {
+    setOpen(false);
+    menuBtn.current?.focus({ preventScroll: true });
+  };
+
+  // Close the menu if the window grows to desktop size
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => mq.matches && setOpen(false);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   return (
     <>
-    <motion.header
-      animate={{ y: hidden ? -100 : 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="fixed inset-x-0 top-0 z-50"
-    >
-      <nav
-        className={`mx-auto mt-3 flex max-w-6xl items-center justify-between rounded-full px-4 py-2.5 transition-all duration-300 sm:px-5 ${
-          scrolled ? "mx-3 border border-line bg-ink/70 shadow-2xl shadow-black/40 backdrop-blur-xl sm:mx-auto" : "border border-transparent"
-        }`}
+      <motion.header
+        animate={{ y: hidden && !open ? -110 : 0 }}
+        transition={{ duration: 0.4, ease }}
+        className="fixed inset-x-0 top-4 z-50 px-3 sm:px-4"
       >
-        <a href="#top" className="group flex items-center gap-2.5" aria-label="Back to top">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-2 font-display text-sm font-bold text-ink transition-transform duration-500 group-hover:rotate-[360deg]">
-            PV
-          </span>
-          <span className="hidden font-display text-[15px] font-semibold tracking-tight sm:block">
-            {site.shortName}<span className="text-accent">.</span>
-          </span>
-        </a>
+        <nav
+          aria-label="Main"
+          className={`${scrolled ? "glass-strong" : "glass"} glass-refract-soft mx-auto flex max-w-[1180px] items-center justify-between gap-3 rounded-full py-2 pl-3 pr-2 transition-shadow duration-300 sm:pl-4 ${
+            scrolled ? "" : "nav-top"
+          }`}
+        >
+          <Logo />
 
-        <ul className="hidden items-center gap-1 md:flex">
-          {links.map((l) => {
-            const isActive = active === l.href.slice(1);
-            return (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  className={`relative rounded-full px-3.5 py-2 text-sm transition-colors ${isActive ? "text-cream" : "text-muted hover:text-cream"}`}
-                >
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-pill"
-                      className="absolute inset-0 -z-10 rounded-full bg-white/[0.07]"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  {l.label}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="flex items-center gap-2">
-          <a
-            href={site.resume}
-            download
-            className="hidden items-center gap-2 rounded-full bg-cream px-4 py-2 text-sm font-medium text-ink transition hover:bg-accent sm:inline-flex"
-          >
-            <Download size={15} /> Resume
-          </a>
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center rounded-full border border-line text-cream md:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-          >
-            {open ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-      </nav>
-    </motion.header>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, clipPath: "circle(0% at 90% 5%)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 90% 5%)" }}
-            exit={{ opacity: 0, clipPath: "circle(0% at 90% 5%)" }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-8 backdrop-blur-xl md:hidden"
-          >
-            <ul className="space-y-2">
-              {links.map((l, i) => (
-                <motion.li
-                  key={l.href}
-                  initial={{ opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.05 }}
-                >
+          <ul className="hidden items-center gap-0.5 lg:flex">
+            {nav.map((l) => {
+              const isActive = active === l.href.slice(1);
+              return (
+                <li key={l.href}>
                   <a
                     href={l.href}
-                    onClick={() => setOpen(false)}
-                    className="font-display text-4xl font-semibold tracking-tight text-cream"
+                    aria-current={isActive ? "true" : undefined}
+                    className={`relative block rounded-full px-4 py-2 text-[15px] transition-colors ${
+                      isActive ? "text-fg" : "text-muted hover:text-fg"
+                    }`}
                   >
-                    <span className="mr-3 font-mono text-sm text-accent">0{i + 1}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-bubble"
+                        aria-hidden
+                        className="glass-pill absolute inset-0 -z-10"
+                        transition={spring}
+                      />
+                    )}
                     {l.label}
                   </a>
-                </motion.li>
-              ))}
-            </ul>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
+              aria-label="Open quick menu"
+              aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
+              className="glass-pill hidden h-10 items-center gap-2 pl-3 pr-2 text-sm text-muted transition hover:text-fg lg:inline-flex"
+            >
+              <Search size={15} aria-hidden />
+              <kbd className="rounded-md border border-line-strong px-1.5 py-0.5 font-mono text-[11px]">
+                {isMac ? "⌘K" : "Ctrl K"}
+              </kbd>
+            </button>
+            <ThemeToggle />
             <a
               href={site.resume}
               download
-              className="mt-10 inline-flex w-fit items-center gap-2 rounded-full bg-cream px-5 py-3 font-medium text-ink"
+              className="btn-gradient hidden items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition hover:brightness-110 sm:inline-flex"
             >
-              <Download size={16} /> Download resume
+              <Download size={15} /> Resume
             </a>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <button
+              ref={menuBtn}
+              type="button"
+              onClick={() => setOpen(true)}
+              className="glass-pill grid h-10 w-10 place-items-center text-fg lg:hidden"
+              aria-label="Open menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+            >
+              <Menu size={18} />
+            </button>
+          </div>
+        </nav>
+      </motion.header>
+
+      {mounted && <MobileMenu open={open} onClose={closeMenu} active={active} />}
     </>
   );
 }

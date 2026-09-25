@@ -7,6 +7,7 @@ import GitHubRepos from "@/components/GitHubRepos";
 import Education from "@/components/Education";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import CommandPalette from "@/components/CommandPalette";
 import { getRepos, timeAgo } from "@/lib/github";
 import { site } from "@/lib/site";
 
@@ -32,7 +33,7 @@ export default async function Home() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
       <Navbar />
-      <main className="relative z-10">
+      <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero />
         <About />
         <Skills />
@@ -42,6 +43,7 @@ export default async function Home() {
         <Contact />
       </main>
       <Footer />
+      <CommandPalette />
     </>
   );
 }
