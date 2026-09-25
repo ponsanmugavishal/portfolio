@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-faint">Currently</p>
-            <p className="mt-3 flex items-center gap-2.5 text-lg text-cream">
+            <p className="mt-3 flex items-center gap-2.5 text-lg text-fg">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-accent" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
@@ -41,7 +41,7 @@ export default function Footer() {
               href="#top"
               whileHover={{ y: -4 }}
               aria-label="Back to top"
-              className="ml-2 grid h-11 w-11 place-items-center rounded-full bg-cream text-ink"
+              className="ml-2 grid h-11 w-11 place-items-center rounded-full btn-gradient text-white"
             >
               <ArrowUp size={18} />
             </motion.a>

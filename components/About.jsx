@@ -26,7 +26,7 @@ function Word({ children, progress, range }) {
   const opacity = useTransform(progress, range, [0.15, 1]);
   return (
     <span className="relative mr-[0.28em] mt-1">
-      <motion.span style={{ opacity }} className="text-cream">{children}</motion.span>
+      <motion.span style={{ opacity }} className="text-fg">{children}</motion.span>
     </span>
   );
 }
@@ -50,7 +50,7 @@ export default function About() {
               </p>
               <ul className="flex flex-wrap gap-2.5">
                 {about.strengths.map((s) => (
-                  <li key={s} className="rounded-full border border-line bg-white/[0.03] px-4 py-2 text-sm text-cream transition hover:border-accent/50 hover:text-accent">
+                  <li key={s} className="rounded-full border border-line bg-white/[0.03] px-4 py-2 text-sm text-fg transition hover:border-accent/50 hover:text-accent">
                     {s}
                   </li>
                 ))}
@@ -65,7 +65,7 @@ export default function About() {
               <Reveal key={f.label} delay={i * 0.07}>
                 <div className="card group h-full p-5 transition hover:-translate-y-1 hover:border-line-strong">
                   <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">{f.label}</p>
-                  <p className="mt-2 text-[15px] font-medium leading-snug text-cream">{f.value}</p>
+                  <p className="mt-2 text-[15px] font-medium leading-snug text-fg">{f.value}</p>
                 </div>
               </Reveal>
             ))}
@@ -79,7 +79,7 @@ export default function About() {
                 {about.hobbies.map((h) => {
                   const Icon = icons[h.icon];
                   return (
-                    <li key={h.label} className="flex items-center gap-3 text-cream">
+                    <li key={h.label} className="flex items-center gap-3 text-fg">
                       <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/5 text-accent">
                         <Icon size={17} />
                       </span>

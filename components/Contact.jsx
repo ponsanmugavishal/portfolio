@@ -19,7 +19,7 @@ function Field({ label, name, type = "text", textarea = false, value, onChange, 
         value={value}
         onChange={onChange}
         aria-invalid={!!error}
-        className={`w-full rounded-xl border bg-ink/60 px-4 py-3.5 text-cream outline-none transition placeholder:text-faint focus:border-accent/70 focus:bg-ink focus:ring-4 focus:ring-accent/10 ${
+        className={`w-full rounded-xl border bg-page/60 px-4 py-3.5 text-fg outline-none transition placeholder:text-faint focus:border-accent/70 focus:bg-page focus:ring-4 focus:ring-accent/10 ${
           error ? "border-red-400/70" : "border-line"
         } ${textarea ? "min-h-[150px] resize-y" : ""}`}
         {...rest}
@@ -96,7 +96,7 @@ export default function Contact() {
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent"><Mail size={19} /></span>
                   <span className="min-w-0">
                     <span className="block text-xs text-faint">Email</span>
-                    <span className="block truncate text-cream">{site.email}</span>
+                    <span className="block truncate text-fg">{site.email}</span>
                   </span>
                 </a>
                 <button
@@ -113,7 +113,7 @@ export default function Contact() {
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent/15 text-accent"><Phone size={19} /></span>
                 <span>
                   <span className="block text-xs text-faint">Phone</span>
-                  <span className="block text-cream">{site.phone}</span>
+                  <span className="block text-fg">{site.phone}</span>
                 </span>
               </a>
             </Reveal>
@@ -122,7 +122,7 @@ export default function Contact() {
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent/15 text-accent"><MapPin size={19} /></span>
                 <span>
                   <span className="block text-xs text-faint">Location</span>
-                  <span className="block break-words text-cream">{site.location}</span>
+                  <span className="block break-words text-fg">{site.location}</span>
                 </span>
               </div>
             </Reveal>
@@ -130,13 +130,13 @@ export default function Contact() {
               <a
                 href={site.resume}
                 download
-                className="group flex items-center justify-between rounded-3xl bg-gradient-to-r from-accent to-accent-2 p-5 font-medium text-ink transition hover:brightness-110"
+                className="group flex items-center justify-between rounded-3xl bg-gradient-to-r from-accent to-accent-2 p-5 font-medium text-white transition hover:brightness-110"
               >
                 <span>
                   <span className="block text-xs font-normal opacity-70">Resume · PDF</span>
                   <span className="block text-lg">Download my resume</span>
                 </span>
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-ink/10 transition group-hover:translate-y-0.5">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-page/10 transition group-hover:translate-y-0.5">
                   <Download size={19} />
                 </span>
               </a>
@@ -171,7 +171,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-cream px-6 py-4 font-medium text-ink transition hover:bg-accent disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full btn-gradient px-6 py-4 font-medium text-white transition hover:bg-accent disabled:cursor-wait disabled:opacity-70 sm:w-auto"
               >
                 {status === "sending" ? (
                   <><LoaderCircle size={18} className="animate-spin" /> Sending…</>

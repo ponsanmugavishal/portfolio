@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { Download, Menu, X } from "lucide-react";
 import { site } from "@/lib/site";
+import ThemeToggle from "./ThemeToggle";
 
 const links = [
   { href: "#about", label: "About" },
@@ -51,11 +52,11 @@ export default function Navbar() {
     >
       <nav
         className={`mx-auto mt-3 flex max-w-6xl items-center justify-between rounded-full px-4 py-2.5 transition-all duration-300 sm:px-5 ${
-          scrolled ? "mx-3 border border-line bg-ink/70 shadow-2xl shadow-black/40 backdrop-blur-xl sm:mx-auto" : "border border-transparent"
+          scrolled ? "mx-3 border border-line bg-page/70 shadow-2xl shadow-black/40 backdrop-blur-xl sm:mx-auto" : "border border-transparent"
         }`}
       >
         <a href="#top" className="group flex items-center gap-2.5" aria-label="Back to top">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-2 font-display text-sm font-bold text-ink transition-transform duration-500 group-hover:rotate-[360deg]">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-2 font-display text-sm font-bold text-white transition-transform duration-500 group-hover:rotate-[360deg]">
             PV
           </span>
           <span className="hidden font-display text-[15px] font-semibold tracking-tight sm:block">
@@ -70,7 +71,7 @@ export default function Navbar() {
               <li key={l.href}>
                 <a
                   href={l.href}
-                  className={`relative rounded-full px-3.5 py-2 text-sm transition-colors ${isActive ? "text-cream" : "text-muted hover:text-cream"}`}
+                  className={`relative rounded-full px-3.5 py-2 text-sm transition-colors ${isActive ? "text-fg" : "text-muted hover:text-fg"}`}
                 >
                   {isActive && (
                     <motion.span
@@ -87,16 +88,17 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <a
             href={site.resume}
             download
-            className="hidden items-center gap-2 rounded-full bg-cream px-4 py-2 text-sm font-medium text-ink transition hover:bg-accent sm:inline-flex"
+            className="hidden items-center gap-2 rounded-full btn-gradient px-4 py-2 text-sm font-medium text-white transition hover:bg-accent sm:inline-flex"
           >
             <Download size={15} /> Resume
           </a>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="grid h-10 w-10 place-items-center rounded-full border border-line text-cream md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-line text-fg md:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -113,7 +115,7 @@ export default function Navbar() {
             animate={{ opacity: 1, clipPath: "circle(150% at 90% 5%)" }}
             exit={{ opacity: 0, clipPath: "circle(0% at 90% 5%)" }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-40 flex flex-col justify-center bg-ink/95 px-8 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-40 flex flex-col justify-center bg-page/95 px-8 backdrop-blur-xl md:hidden"
           >
             <ul className="space-y-2">
               {links.map((l, i) => (
@@ -126,7 +128,7 @@ export default function Navbar() {
                   <a
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="font-display text-4xl font-semibold tracking-tight text-cream"
+                    className="font-display text-4xl font-semibold tracking-tight text-fg"
                   >
                     <span className="mr-3 font-mono text-sm text-accent">0{i + 1}</span>
                     {l.label}
@@ -137,7 +139,7 @@ export default function Navbar() {
             <a
               href={site.resume}
               download
-              className="mt-10 inline-flex w-fit items-center gap-2 rounded-full bg-cream px-5 py-3 font-medium text-ink"
+              className="mt-10 inline-flex w-fit items-center gap-2 rounded-full btn-gradient px-5 py-3 font-medium text-white"
             >
               <Download size={16} /> Download resume
             </a>

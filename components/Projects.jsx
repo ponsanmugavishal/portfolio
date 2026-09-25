@@ -25,7 +25,7 @@ function TiltPanel({ children }) {
         onPointerMove={onMove}
         onPointerLeave={reset}
         style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
-        className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-ink"
+        className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-page"
       >
         {children}
       </motion.div>
@@ -42,7 +42,7 @@ function ProjectCard({ project, index, total, progress }) {
     <div className="mb-8 md:sticky md:top-0 md:mb-0 md:flex md:h-screen md:items-center">
       <motion.article
         style={{ scale, top: `${index * 28}px` }}
-        className="relative w-full origin-top rounded-[2rem] border border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.8)] md:p-8"
+        className="relative w-full origin-top rounded-[2rem] border border-line bg-surface-solid p-5 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.8)] md:p-8"
       >
         <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1.05fr_1fr] md:gap-10">
           <TiltPanel>
@@ -57,14 +57,14 @@ function ProjectCard({ project, index, total, progress }) {
                 {project.label}
               </span>
             </div>
-            <h3 className="mt-4 font-display text-2xl font-semibold leading-tight tracking-tight text-cream md:text-[2rem]">
+            <h3 className="mt-4 font-display text-2xl font-semibold leading-tight tracking-tight text-fg md:text-[2rem]">
               {project.title}
             </h3>
             <p className="mt-3 text-[15px] leading-relaxed text-muted">{project.summary}</p>
 
             <ul className="mt-5 space-y-2.5">
               {project.points.map((pt) => (
-                <li key={pt} className="flex gap-3 text-[15px] leading-relaxed text-cream/85">
+                <li key={pt} className="flex gap-3 text-[15px] leading-relaxed text-fg/85">
                   <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                   {pt}
                 </li>
@@ -73,7 +73,7 @@ function ProjectCard({ project, index, total, progress }) {
 
             <div className="mt-6 flex flex-wrap items-center gap-2">
               {project.tech.map((t) => (
-                <span key={t} className="rounded-lg bg-white/[0.05] px-3 py-1.5 font-mono text-xs text-cream/80">
+                <span key={t} className="rounded-lg bg-white/[0.05] px-3 py-1.5 font-mono text-xs text-fg/80">
                   {t}
                 </span>
               ))}

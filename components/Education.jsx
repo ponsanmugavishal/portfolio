@@ -33,7 +33,7 @@ export default function Education() {
                   whileInView={{ scale: 1, opacity: 1 }}
                   viewport={{ once: true, margin: "-100px 0px" }}
                   transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                  className="absolute left-0 top-7 z-10 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-accent/60 bg-ink text-accent md:left-1/2"
+                  className="absolute left-0 top-7 z-10 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-accent/60 bg-page text-accent md:left-1/2"
                 >
                   <GraduationCap size={16} />
                 </motion.span>
@@ -46,9 +46,9 @@ export default function Education() {
                   className={`card ml-10 p-6 md:ml-0 ${right ? "md:col-start-2" : "md:col-start-1 md:text-right"}`}
                 >
                   <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">{e.period}</p>
-                  <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-cream md:text-2xl">{e.title}</h3>
+                  <h3 className="mt-2 font-display text-xl font-semibold leading-snug text-fg md:text-2xl">{e.title}</h3>
                   <p className="mt-1.5 text-muted">{e.place}</p>
-                  <p className={`mt-4 inline-flex rounded-full bg-white/[0.06] px-3 py-1 font-mono text-sm text-cream`}>
+                  <p className={`mt-4 inline-flex rounded-full bg-white/[0.06] px-3 py-1 font-mono text-sm text-fg`}>
                     {e.score}
                   </p>
                 </motion.div>

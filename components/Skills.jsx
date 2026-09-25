@@ -11,7 +11,7 @@ function MarqueeRow({ items, reverse = false, outline = false }) {
       <div className={`flex shrink-0 items-center gap-10 pr-10 ${reverse ? "animate-marquee-reverse" : "animate-marquee"} hover:[animation-play-state:paused]`}>
         {doubled.map((s, i) => (
           <span key={i} className="flex items-center gap-10 whitespace-nowrap">
-            <span className={`font-display text-5xl font-semibold tracking-tight md:text-7xl ${outline ? "text-outline" : "text-cream"}`}>
+            <span className={`font-display text-5xl font-semibold tracking-tight md:text-7xl ${outline ? "text-outline" : "text-fg"}`}>
               {s}
             </span>
             <span className="text-3xl text-accent">✦</span>
@@ -46,10 +46,10 @@ export default function Skills() {
             >
               <div aria-hidden className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-accent/70 to-transparent opacity-0 transition group-hover:opacity-100" />
               <p className="font-mono text-xs text-accent">0{i + 1}</p>
-              <h3 className="mt-3 font-display text-xl font-semibold text-cream">{g.title}</h3>
+              <h3 className="mt-3 font-display text-xl font-semibold text-fg">{g.title}</h3>
               <ul className="mt-5 space-y-2.5">
                 {g.items.map((it) => (
-                  <li key={it} className="flex items-center gap-2.5 text-[15px] text-muted transition group-hover:text-cream">
+                  <li key={it} className="flex items-center gap-2.5 text-[15px] text-muted transition group-hover:text-fg">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent/70" />
                     {it}
                   </li>

@@ -49,7 +49,7 @@ function Chip({ label, pos, depth, float, mx, my }) {
       <motion.div
         animate={{ y: [0, -12, 0] }}
         transition={{ duration: float, repeat: Infinity, ease: "easeInOut" }}
-        className="rounded-full border border-line-strong bg-ink/70 px-4 py-2 font-mono text-xs text-cream shadow-xl shadow-black/40 backdrop-blur-md"
+        className="rounded-full border border-line-strong bg-page/70 px-4 py-2 font-mono text-xs text-fg shadow-xl shadow-black/40 backdrop-blur-md"
       >
         <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-accent align-middle" />
         {label}
@@ -97,7 +97,7 @@ export default function Hero() {
         <div className="bg-grid absolute inset-0" />
         <div className="animate-blob absolute -right-32 top-10 h-[520px] w-[520px] rounded-full bg-accent/25 blur-[120px]" />
         <div className="animate-blob absolute right-40 top-64 h-[360px] w-[360px] rounded-full bg-accent-2/15 blur-[110px] [animation-delay:-6s]" />
-        <div className="animate-blob absolute -left-40 bottom-0 h-[460px] w-[460px] rounded-full bg-plum/25 blur-[130px] [animation-delay:-11s]" />
+        <div className="animate-blob absolute -left-40 bottom-0 h-[460px] w-[460px] rounded-full bg-accent-2/25 blur-[130px] [animation-delay:-11s]" />
       </div>
 
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-14 px-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8">
@@ -166,7 +166,7 @@ export default function Hero() {
           >
             <Magnetic
               href="#projects"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 font-medium text-ink shadow-[0_10px_40px_-10px_rgba(255,106,61,0.7)] transition-colors hover:bg-accent-2"
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 font-medium text-white shadow-[0_10px_40px_-10px_rgba(255,106,61,0.7)] transition-colors hover:bg-accent-2"
             >
               View my work
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
@@ -174,7 +174,7 @@ export default function Hero() {
             <Magnetic
               href={site.resume}
               download
-              className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3.5 font-medium text-cream transition-colors hover:border-cream/40 hover:bg-white/5"
+              className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3.5 font-medium text-fg transition-colors hover:border-fg/40 hover:bg-white/5"
             >
               <Download size={17} /> Download resume
             </Magnetic>
@@ -198,7 +198,7 @@ export default function Hero() {
                     className="group relative grid h-11 w-11 place-items-center rounded-full border border-line text-muted transition hover:-translate-y-1 hover:border-accent/60 hover:text-accent"
                   >
                     <Icon size={18} />
-                    <span className="pointer-events-none absolute -bottom-8 whitespace-nowrap rounded-md bg-surface-2 px-2 py-1 text-[11px] text-cream opacity-0 transition group-hover:opacity-100">
+                    <span className="pointer-events-none absolute -bottom-8 whitespace-nowrap rounded-md bg-page-2 px-2 py-1 text-[11px] text-fg opacity-0 transition group-hover:opacity-100">
                       {s.label}
                     </span>
                   </a>
@@ -219,7 +219,7 @@ export default function Hero() {
           {/* glowing disc */}
           <motion.div
             style={{ x: ringX, y: ringY }}
-            className="absolute inset-x-[6%] top-[8%] aspect-square rounded-full bg-gradient-to-br from-accent via-accent-2/80 to-plum opacity-90 shadow-[0_0_120px_20px_rgba(255,106,61,0.25)]"
+            className="absolute inset-x-[6%] top-[8%] aspect-square rounded-full bg-gradient-to-br from-accent via-accent-2/80 to-accent-2 opacity-90 shadow-[0_0_120px_20px_rgba(255,106,61,0.25)]"
           />
           {/* rotating text ring */}
           <motion.div style={{ x: ringX, y: ringY }} className="absolute inset-x-[-2%] top-[0%] aspect-square">
@@ -228,7 +228,7 @@ export default function Hero() {
                 <path id="ring" d="M100,100 m-88,0 a88,88 0 1,1 176,0 a88,88 0 1,1 -176,0" />
               </defs>
               <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(243,240,232,0.14)" strokeDasharray="2 6" />
-              <text className="fill-cream/50 font-mono" fontSize="7.2" letterSpacing="3.2">
+              <text className="fill-fg/50 font-mono" fontSize="7.2" letterSpacing="3.2">
                 <textPath href="#ring">SOFTWARE DEVELOPER · ECE STUDENT · PYTHON · JAVA · MYSQL · </textPath>
               </text>
             </svg>
@@ -257,13 +257,13 @@ export default function Hero() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.1, duration: 0.7 }}
-            className="absolute -left-4 bottom-[9%] z-20 flex items-center gap-3 rounded-2xl border border-line-strong bg-ink/75 p-3 pr-4 shadow-2xl shadow-black/50 backdrop-blur-md sm:-left-10"
+            className="absolute -left-4 bottom-[9%] z-20 flex items-center gap-3 rounded-2xl border border-line-strong bg-page/75 p-3 pr-4 shadow-2xl shadow-black/50 backdrop-blur-md sm:-left-10"
           >
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/15 text-accent">
               <GraduationCap size={20} />
             </span>
             <span className="text-left">
-              <span className="block text-sm font-semibold text-cream">B.E. ECE</span>
+              <span className="block text-sm font-semibold text-fg">B.E. ECE</span>
               <span className="block text-xs text-muted">MKCE · 2024–2028</span>
             </span>
           </motion.div>
@@ -271,7 +271,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.25, duration: 0.7 }}
-            className="absolute -right-2 top-[6%] z-20 flex items-center gap-2 rounded-full border border-line-strong bg-ink/75 px-3.5 py-2 text-xs text-cream shadow-xl shadow-black/40 backdrop-blur-md sm:-right-6"
+            className="absolute -right-2 top-[6%] z-20 flex items-center gap-2 rounded-full border border-line-strong bg-page/75 px-3.5 py-2 text-xs text-fg shadow-xl shadow-black/40 backdrop-blur-md sm:-right-6"
           >
             <MapPin size={14} className="text-accent" /> Namakkal, Tamil Nadu
           </motion.div>

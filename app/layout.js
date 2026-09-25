@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/lib/site";
 import Providers from "@/components/Providers";
+import { themeColors } from "@/lib/theme";
 import "./globals.css";
 
 const bricolage = localFont({
@@ -62,13 +63,17 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#0b0b10",
+  themeColor: themeColors.light,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${inter.variable} ${jetbrains.variable}`}>
-      <body className="grain">
+    <html
+      lang="en"
+      className={`${bricolage.variable} ${inter.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+    >
+      <body>
         <Providers>{children}</Providers>
         <Analytics />
       </body>

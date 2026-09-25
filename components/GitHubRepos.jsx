@@ -57,9 +57,9 @@ export default function GitHubRepos({ repos }) {
               <div aria-hidden className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-accent/0 blur-3xl transition-colors duration-500 group-hover:bg-accent/20" />
               <div className="flex items-start justify-between gap-4">
                 <FolderGit2 size={22} className="text-accent" />
-                <ArrowUpRight size={18} className="text-faint transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cream" />
+                <ArrowUpRight size={18} className="text-faint transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
               </div>
-              <h3 className="mt-5 break-words font-display text-lg font-semibold text-cream">{r.name}</h3>
+              <h3 className="mt-5 break-words font-display text-lg font-semibold text-fg">{r.name}</h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
                 {r.description || "No description yet — open it on GitHub to see the code."}
               </p>
@@ -84,7 +84,7 @@ export default function GitHubRepos({ repos }) {
           <span className="flex items-center gap-2">
             <RefreshCw size={14} className="text-accent" /> Synced automatically with GitHub
           </span>
-          <a href={profile} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1.5 font-medium text-cream hover:text-accent">
+          <a href={profile} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1.5 font-medium text-fg hover:text-accent">
             View full GitHub profile
             <ArrowUpRight size={16} className="transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </a>
