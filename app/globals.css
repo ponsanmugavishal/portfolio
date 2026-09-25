@@ -62,6 +62,7 @@
   --viz-bulb-on: #fbbf24;
 
   --outline-stroke: rgba(11, 16, 32, 0.22);
+  --outline-accent: rgba(79, 70, 229, 0.55);
   --scrollbar: #c9cfe8;
   --scrollbar-hover: #a9b0d6;
 }
@@ -118,6 +119,7 @@
   --viz-bulb-on: #fcd34d;
 
   --outline-stroke: rgba(238, 241, 255, 0.24);
+  --outline-accent: rgba(143, 168, 255, 0.5);
   --scrollbar: #232a48;
   --scrollbar-hover: #333c64;
 }
@@ -271,8 +273,16 @@ html.supports-refraction .glass-refract {
   -webkit-backdrop-filter: url(#liquid-glass) blur(20px) saturate(170%);
   backdrop-filter: url(#liquid-glass) blur(20px) saturate(170%);
 }
-html.supports-refraction .glass-strong.glass-refract {
-  backdrop-filter: url(#liquid-glass) blur(28px) saturate(180%);
+/* Thin bars (navbar) only refract on desktop — on small screens it smears */
+@media (min-width: 1024px) {
+  html.supports-refraction .glass-refract-soft {
+    -webkit-backdrop-filter: url(#liquid-glass-soft) blur(20px) saturate(170%);
+    backdrop-filter: url(#liquid-glass-soft) blur(20px) saturate(170%);
+  }
+  html.supports-refraction .glass-strong.glass-refract-soft {
+    -webkit-backdrop-filter: url(#liquid-glass-soft) blur(28px) saturate(180%);
+    backdrop-filter: url(#liquid-glass-soft) blur(28px) saturate(180%);
+  }
 }
 
 /* Visitors who ask for less transparency get solid surfaces */
@@ -280,7 +290,8 @@ html.supports-refraction .glass-strong.glass-refract {
   .glass,
   .glass-strong,
   .glass-pill,
-  html.supports-refraction .glass-refract {
+  html.supports-refraction .glass-refract,
+  html.supports-refraction .glass-refract-soft {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     background: var(--surface-solid);
@@ -362,9 +373,10 @@ p { text-wrap: pretty; }
   background-image: linear-gradient(100deg, var(--accent) 5%, var(--accent-2) 95%);
 }
 
+/* Outlined text via the #text-outline SVG filter (see GlassDefs) */
 .text-outline {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--outline-stroke);
+  color: #000;
+  filter: url(#text-outline);
 }
 
 /* Primary call-to-action: blue → violet gradient with white text */
@@ -402,4 +414,85 @@ textarea:-webkit-autofill {
 .nav-top {
   box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-lowlight);
 }
+}
+
+/* ───────────── Hero entrance (CSS, so it starts on first paint — good for LCP) ───────────── */
+@layer components {
+  .enter-rise { animation: enter-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0s); }
+  .enter-fade { animation: enter-fade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0s); }
+  .enter-scale { animation: enter-scale 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0s); }
+
+  /* Aurora glow inside the hero glass orb */
+  .orb-fill {
+    background:
+      radial-gradient(55% 45% at 25% 30%, var(--aurora-1), transparent 70%),
+      radial-gradient(50% 50% at 80% 35%, var(--aurora-2), transparent 70%),
+      radial-gradient(70% 55% at 50% 95%, var(--aurora-3), transparent 70%);
+    opacity: 0.95;
+  }
+  [data-theme="dark"] .orb-fill { opacity: 0.75; }
+}
+@keyframes enter-rise { from { transform: translateY(110%); } }
+@keyframes enter-fade { from { opacity: 0; transform: translateY(16px); } }
+@keyframes enter-scale { from { transform: scale(0.94) translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-rise, .enter-fade, .enter-scale { animation: none !important; }
+}
+
+/* Hero: the rotating phrase shrinks (never grows) so the longest one fits on one line */
+.hero-text { container-type: inline-size; }
+.hero-rotating { font-size: min(1em, 9.1cqw); letter-spacing: -0.02em; }
+
+/* Small solid chip for use inside glass cards (no extra blur layer) */
+@layer components {
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in srgb, var(--surface-solid) 55%, transparent);
+    padding: 0.4rem 0.9rem;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--fg);
+  }
+}
+
+/* Project cards stack on top of each other, so they use a denser glass */
+@layer components {
+  .project-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-solid) 94%, transparent),
+      color-mix(in srgb, var(--surface-solid) 84%, transparent)
+    );
+  }
+}
+
+/* Contact form fields */
+@layer components {
+  .field {
+    display: block;
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in srgb, var(--surface-solid) 60%, transparent);
+    padding: 1.6rem 1rem 0.55rem;
+    font-size: 16px; /* 16px stops iOS zooming into the field */
+    color: var(--fg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  }
+  .field:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--line-strong)); }
+  .field:focus-visible,
+  .field:focus {
+    border-color: var(--accent);
+    background: var(--surface-solid);
+    box-shadow: 0 0 0 4px var(--focus);
+    outline: none;
+    border-radius: 16px;
+  }
+  .field-error { border-color: var(--danger); }
 }

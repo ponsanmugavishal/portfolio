@@ -180,7 +180,7 @@ export default function Navbar() {
       >
         <nav
           aria-label="Main"
-          className={`${scrolled ? "glass-strong" : "glass"} glass-refract mx-auto flex max-w-[1180px] items-center justify-between gap-3 rounded-full py-2 pl-3 pr-2 transition-shadow duration-300 sm:pl-4 ${
+          className={`${scrolled ? "glass-strong" : "glass"} glass-refract-soft mx-auto flex max-w-[1180px] items-center justify-between gap-3 rounded-full py-2 pl-3 pr-2 transition-shadow duration-300 sm:pl-4 ${
             scrolled ? "" : "nav-top"
           }`}
         >
