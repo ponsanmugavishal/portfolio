@@ -65,23 +65,27 @@ export default function Footer() {
           {/* Outline drawn by a filter (grow the letters, cut out the original)
               so overlapping glyph parts in the variable font don't show inside letters. */}
           <defs>
-            <filter id="name-outline" x="-2%" y="-10%" width="104%" height="120%">
-              <feMorphology in="SourceAlpha" operator="dilate" radius="1.3" result="grown" />
-              <feComposite in="grown" in2="SourceAlpha" operator="out" result="ring" />
-              <feFlood style={{ floodColor: "var(--outline-stroke)" }} />
-              <feComposite in2="ring" operator="in" />
-            </filter>
+            {[
+              ["name-outline", 1.3],
+              ["name-outline-thick", 3.2], // phones: the SVG is scaled down, so the line needs to be thicker
+            ].map(([id, radius]) => (
+              <filter key={id} id={id} x="-2%" y="-10%" width="104%" height="120%">
+                <feMorphology in="SourceAlpha" operator="dilate" radius={radius} result="grown" />
+                <feComposite in="grown" in2="SourceAlpha" operator="out" result="ring" />
+                <feFlood style={{ floodColor: "var(--outline-stroke)" }} />
+                <feComposite in2="ring" operator="in" />
+              </filter>
+            ))}
           </defs>
           <text
             x="0"
             y="100"
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
-            className="font-display"
+            className="footer-name font-display"
             fontSize="118"
             fontWeight="700"
             fill="#000"
-            filter="url(#name-outline)"
           >
             PON SANMUGA VISHAL
           </text>

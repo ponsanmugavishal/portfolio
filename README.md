@@ -1,6 +1,7 @@
 # Pon Sanmuga Vishal G — Portfolio
 
 Personal portfolio built with **Next.js 16**, **Tailwind CSS 4** and **Motion** (Framer Motion), made to deploy on **Vercel**.
+The design is a light-first **"liquid glass"** look (frosted glass cards on a soft blue-violet aurora), with an optional dark theme.
 
 **Live:** https://ponsanmugavishal.vercel.app
 
@@ -8,15 +9,21 @@ Personal portfolio built with **Next.js 16**, **Tailwind CSS 4** and **Motion** 
 
 | Feature | How it works |
 | --- | --- |
-| Animated hero | Cut-out photo with mouse parallax, rotating text ring, floating skill chips, scroll effects |
-| Projects | Stacking cards on scroll, 3D tilt, animated illustrations for each project |
+| Liquid glass design | Frosted glass cards with a light rim and a shine that follows the mouse; extra "refraction" in Chrome/Edge |
+| Light & dark theme | Opens in light. The sun/moon button (navbar, mobile menu, footer) switches theme; the choice is remembered |
+| Aurora background | Slowly drifting blue / violet / cyan light behind the whole site |
+| Smooth scrolling | **Lenis**; menu links glide to each section and stop just below the navbar |
+| Animated hero | Cut-out photo in a glass orb (head pops out of the top), mouse parallax, floating chips, rotating words, stats strip |
+| Projects | Stacking cards on desktop, 3D tilt, animated illustrations for each project (colours follow the theme) |
 | Live GitHub repos | Fetched on the server from the GitHub API, refreshed every hour automatically |
 | Contact form | `POST /api/contact` → sends the message to your Gmail through **Resend**; *Reply* goes straight to the sender |
 | Spam protection | Hidden honeypot field, minimum fill time, 5 messages / 10 min per IP, input validation |
+| Quick menu | Press **Ctrl + K** (**⌘ + K** on Mac) or the search button in the navbar: jump to a section, copy email, get the resume, switch theme |
 | Resume download | `public/resume/Pon_Sanmuga_Vishal_G_Resume.pdf` |
 | Visitor stats | **Vercel Web Analytics** (see visits, countries, devices in your Vercel dashboard) |
 | Link previews | Auto-generated preview image when the link is shared on WhatsApp / LinkedIn |
 | SEO | Page metadata, `sitemap.xml`, `robots.txt`, structured data |
+| Accessibility | Keyboard friendly, skip link, visible focus rings, WCAG AA contrast in both themes; respects "reduce motion" and "reduce transparency" settings |
 
 ## Edit your content
 
@@ -25,6 +32,30 @@ Everything personal is in **`lib/site.js`** — name, links, projects, education
 - Add LinkedIn: set the `url` of the LinkedIn entry in `socials` (it's hidden while empty).
 - New resume: replace `public/resume/Pon_Sanmuga_Vishal_G_Resume.pdf` (keep the same file name).
 - New photo: replace `public/images/vishal-cutout.webp` (transparent background works best).
+- Hero words, intro sentence and the floating chips: `heroWords`, `heroIntro`, `heroChips` in `site`.
+- The stats strip under the hero is built automatically from your facts (number of projects, degree, languages).
+
+## Change the colours
+
+All colours live at the top of **`app/globals.css`**:
+
+- `:root, [data-theme="light"] { … }` — the light theme (the default)
+- `[data-theme="dark"] { … }` — the dark theme
+
+The most useful ones:
+
+| Variable | What it colours |
+| --- | --- |
+| `--page` | page background |
+| `--fg`, `--muted` | main text, secondary text |
+| `--accent`, `--accent-2` | links, icons, highlights |
+| `--btn-from`, `--btn-to` | the blue → violet gradient on the main buttons |
+| `--glass-top`, `--glass-bottom` | how see-through the glass cards are |
+| `--aurora-1/2/3` | the three background glow colours |
+| `--viz-*` | colours inside the project illustrations |
+
+If you change `--page`, also update the same colour in `lib/theme.js` (used for the phone's address-bar colour).
+Motion timings (easing, durations, hover lift) are in `lib/motion.js`.
 
 ## Deploy (replace the current site)
 
@@ -78,12 +109,23 @@ npm run dev                  # open http://localhost:3000
 ```
 app/
   page.js               the page (sections + live GitHub data)
-  layout.js             fonts, SEO metadata, analytics
+  layout.js             fonts, SEO metadata, analytics, aurora, skip link
+  globals.css           colours for both themes, glass styles, animations
   api/contact/route.js  contact-form backend (Resend)
   opengraph-image.js    link-preview image
-components/             Hero, About, Skills, Projects, GitHubRepos, Education, Contact, Footer
-components/visuals/     animated project illustrations (SVG)
-lib/site.js             ← all your content
-lib/github.js           GitHub API fetch (hourly refresh)
+components/
+  Hero, About, Skills, Projects, GitHubRepos, Education, Contact, Footer
+  Navbar                floating glass navbar + mobile menu
+  Glass                 reusable glass surface
+  ThemeToggle           sun/moon button
+  CommandPalette        Ctrl/⌘ + K quick menu
+  SmoothScroll          Lenis smooth scrolling + section links
+  Aurora                background glow
+  visuals/              animated project illustrations (SVG)
+lib/
+  site.js               ← all your content
+  github.js             GitHub API fetch (hourly refresh)
+  motion.js             shared animation settings
+  theme.js              address-bar colour per theme
 public/                 photo + resume PDF
 ```

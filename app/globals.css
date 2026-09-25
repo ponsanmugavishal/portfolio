@@ -500,3 +500,9 @@ textarea:-webkit-autofill {
   }
   .field-error { border-color: var(--danger); }
 }
+
+/* Footer name outline: thicker filter on small screens (see Footer.jsx) */
+.footer-name { filter: url(#name-outline-thick); }
+@media (min-width: 768px) {
+  .footer-name { filter: url(#name-outline); }
+}
