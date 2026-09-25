@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/lib/site";
 import Providers from "@/components/Providers";
+import GlassDefs from "@/components/GlassDefs";
 import { themeColors } from "@/lib/theme";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body>
+        <GlassDefs />
         <Providers>{children}</Providers>
         <Analytics />
       </body>

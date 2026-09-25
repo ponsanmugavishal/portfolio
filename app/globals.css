@@ -12,7 +12,7 @@
   --page-2: #eef1fe;
   --fg: #0b1020;
   --muted: #4a5372;
-  --faint: #5e6684;
+  --faint: #525a78; /* darkened from #5e6684 for AA over the aurora */
   --line: rgba(11, 16, 32, 0.08);
   --line-strong: rgba(11, 16, 32, 0.14);
   --accent: #4f46e5;
@@ -34,6 +34,8 @@
   --glass-shine: rgba(255, 255, 255, 0.55);
   --glass-shadow: 0 1px 2px rgba(20, 30, 80, 0.06), 0 16px 48px -16px rgba(60, 70, 180, 0.22);
   --surface-solid: #ffffff;
+  --glass-strong-top: rgba(255, 255, 255, 0.86);
+  --glass-strong-bottom: rgba(255, 255, 255, 0.7);
 
   /* aurora */
   --aurora-1: #a5b4fc;
@@ -71,7 +73,7 @@
   --page-2: #0b1020;
   --fg: #eef1ff;
   --muted: #a3abcf;
-  --faint: #7a82a8;
+  --faint: #8e96ba; /* lightened from #7a82a8 for AA on glass */
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.16);
   --accent: #8fa8ff;
@@ -90,6 +92,8 @@
   --glass-shine: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.65);
   --surface-solid: #111628;
+  --glass-strong-top: rgba(22, 28, 52, 0.78);
+  --glass-strong-bottom: rgba(12, 16, 32, 0.7);
 
   --aurora-1: #3b5bff;
   --aurora-2: #7c3aed;
@@ -196,6 +200,90 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.2em;
+}
+
+/* ───────────── Liquid glass material ─────────────
+   .glass           cards (28px radius)
+   .glass-strong    navbar / menus (more blur, more opaque)
+   .glass-pill      buttons & chips (fully round, lighter shadow)
+   .glass-interactive  adds the cursor-following shine (JS sets --mx / --my)
+   .glass-refract   Chromium-only refraction, see html.supports-refraction  */
+.glass,
+.glass-strong,
+.glass-pill {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(135deg, var(--glass-top), var(--glass-bottom));
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border-radius: 28px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-lowlight), var(--glass-shadow);
+}
+.glass-strong {
+  background: linear-gradient(135deg, var(--glass-strong-top), var(--glass-strong-bottom));
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+}
+.glass-pill {
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  backdrop-filter: blur(14px) saturate(170%);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-lowlight), 0 1px 2px rgba(20, 30, 80, 0.06), 0 6px 18px -8px rgba(60, 70, 180, 0.2);
+}
+[data-theme="dark"] .glass-pill {
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-lowlight), 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* 1px rim that catches light: bright on top, fading down */
+.glass::before,
+.glass-strong::before,
+.glass-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--glass-rim-top), var(--glass-rim-bottom));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Shine that follows the cursor */
+.glass-interactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), var(--glass-shine), transparent 45%);
+  transition: opacity 0.3s ease;
+}
+.glass-interactive:hover::after { opacity: 1; }
+
+/* Refraction: only where Chromium was detected (Safari/Firefox keep the plain blur) */
+html.supports-refraction .glass-refract {
+  -webkit-backdrop-filter: url(#liquid-glass) blur(20px) saturate(170%);
+  backdrop-filter: url(#liquid-glass) blur(20px) saturate(170%);
+}
+html.supports-refraction .glass-strong.glass-refract {
+  backdrop-filter: url(#liquid-glass) blur(28px) saturate(180%);
+}
+
+/* Visitors who ask for less transparency get solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong,
+  .glass-pill,
+  html.supports-refraction .glass-refract {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--surface-solid);
+  }
 }
 
 /* ───────────── Base ───────────── */
