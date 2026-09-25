@@ -3,60 +3,75 @@
 import { motion } from "motion/react";
 import { ArrowUp } from "lucide-react";
 import { site } from "@/lib/site";
-import { icons } from "./ui";
+import { ease, hover } from "@/lib/motion";
+import { icons, StatusDot } from "./ui";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Footer() {
   const socials = site.socials.filter((s) => s.url);
   return (
-    <footer className="relative overflow-hidden border-t border-line pt-20">
-      <div className="mx-auto max-w-6xl px-5">
-        <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
+    <footer className="relative z-10 overflow-x-clip pt-24">
+      <div className="container-page">
+        <div className="glass flex flex-col gap-8 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.25em] text-faint">Currently</p>
-            <p className="mt-3 flex items-center gap-2.5 text-lg text-fg">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-accent" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
-              </span>
-              {site.status}
+            <p className="text-label text-faint">Currently</p>
+            <p className="mt-3 flex items-center gap-3 font-display text-2xl font-semibold tracking-tight text-fg">
+              <StatusDot /> {site.status}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex flex-wrap items-center gap-2.5">
             {socials.map((s) => {
               const Icon = icons[s.icon];
+              const external = s.url.startsWith("http");
               return (
-                <a
+                <motion.a
                   key={s.label}
                   href={s.url}
-                  target={s.url.startsWith("http") ? "_blank" : undefined}
-                  rel="noreferrer"
-                  aria-label={s.label}
-                  className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted transition hover:-translate-y-1 hover:border-accent/60 hover:text-accent"
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noreferrer" : undefined}
+                  whileHover={{ y: hover.lift / 2 }}
+                  whileTap={{ scale: hover.press }}
+                  className="glass-pill inline-flex items-center gap-2 px-4 py-2.5 text-sm text-fg"
                 >
-                  <Icon size={18} />
-                </a>
+                  <Icon size={16} className="text-accent" aria-hidden />
+                  {s.label}
+                </motion.a>
               );
             })}
+            <ThemeToggle size={42} />
             <motion.a
               href="#top"
-              whileHover={{ y: -4 }}
               aria-label="Back to top"
-              className="ml-2 grid h-11 w-11 place-items-center rounded-full btn-gradient text-white"
+              whileHover={{ y: hover.lift / 2 }}
+              whileTap={{ scale: hover.press }}
+              className="btn-gradient grid h-[42px] w-[42px] place-items-center rounded-full"
             >
               <ArrowUp size={18} />
             </motion.a>
           </div>
         </div>
 
+        {/* Big outlined name — SVG text always stretches to fit the width */}
         <motion.svg
           aria-hidden
           viewBox="0 0 1000 118"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          viewport={{ once: true, margin: "0px 0px -40px 0px" }}
+          transition={{ duration: 1, ease }}
           className="mt-16 block w-full select-none"
         >
+          {/* Outline drawn by a filter (grow the letters, cut out the original)
+              so overlapping glyph parts in the variable font don't show inside letters. */}
+          <defs>
+            <filter id="name-outline" x="-2%" y="-10%" width="104%" height="120%">
+              <feMorphology in="SourceAlpha" operator="dilate" radius="1.3" result="grown" />
+              <feComposite in="grown" in2="SourceAlpha" operator="out" result="ring" />
+              <feFlood style={{ floodColor: "var(--outline-stroke)" }} />
+              <feComposite in2="ring" operator="in" />
+            </filter>
+          </defs>
           <text
             x="0"
             y="100"
@@ -65,16 +80,17 @@ export default function Footer() {
             className="font-display"
             fontSize="118"
             fontWeight="700"
-            fill="none"
-            stroke="rgba(243,240,232,0.28)"
-            strokeWidth="1.2"
+            fill="#000"
+            filter="url(#name-outline)"
           >
             PON SANMUGA VISHAL
           </text>
         </motion.svg>
 
-        <div className="flex flex-col items-center justify-between gap-3 border-t border-line py-8 text-sm text-faint sm:flex-row">
-          <p>© {new Date().getFullYear()} {site.name}</p>
+        <div className="flex flex-col items-center justify-between gap-2 border-t border-line py-8 text-sm text-muted sm:flex-row">
+          <p>
+            © {new Date().getFullYear()} {site.name}
+          </p>
           <p>Built with Next.js · Hosted on Vercel</p>
         </div>
       </div>

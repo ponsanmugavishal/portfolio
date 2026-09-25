@@ -202,6 +202,7 @@
   letter-spacing: 0.2em;
 }
 
+@layer components {
 /* ───────────── Liquid glass material ─────────────
    .glass           cards (28px radius)
    .glass-strong    navbar / menus (more blur, more opaque)
@@ -286,6 +287,41 @@ html.supports-refraction .glass-strong.glass-refract {
   }
 }
 
+/* ───────────── Aurora background ───────────── */
+.aurora-blob {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 9999px;
+  opacity: var(--aurora-opacity);
+  will-change: transform;
+}
+/* Radial gradients instead of filter: blur() — same softness, far cheaper */
+.aurora-blob-1 { top: -30vmax; left: -20vmax; background: radial-gradient(closest-side, var(--aurora-1), transparent); animation: aurora-a 26s ease-in-out infinite alternate; }
+.aurora-blob-2 { top: -20vmax; right: -30vmax; background: radial-gradient(closest-side, var(--aurora-2), transparent); animation: aurora-b 30s ease-in-out infinite alternate; }
+.aurora-blob-3 { bottom: -35vmax; left: 10vmax; background: radial-gradient(closest-side, var(--aurora-3), transparent); opacity: calc(var(--aurora-opacity) * 0.85); animation: aurora-c 22s ease-in-out infinite alternate; }
+.aurora-blob-4 { bottom: -25vmax; right: -15vmax; width: 55vmax; height: 55vmax; background: radial-gradient(closest-side, var(--aurora-2), transparent); opacity: calc(var(--aurora-opacity) * 0.75); animation: aurora-a 28s ease-in-out infinite alternate-reverse; }
+
+@keyframes aurora-a { to { transform: translate3d(12vw, 10vh, 0) scale(1.12); } }
+@keyframes aurora-b { to { transform: translate3d(-14vw, 14vh, 0) scale(0.9); } }
+@keyframes aurora-c { to { transform: translate3d(10vw, -12vh, 0) scale(1.15); } }
+
+.aurora-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 20%, transparent 75%);
+}
+.aurora-grain {
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
+}
+
 /* ───────────── Base ───────────── */
 html {
   scroll-padding-top: 96px;
@@ -315,6 +351,7 @@ p { text-wrap: pretty; }
   border-radius: 12px;
 }
 
+@layer components {
 .text-gradient {
   background: linear-gradient(100deg, var(--btn-from) 5%, var(--accent-2) 95%);
   -webkit-background-clip: text;
@@ -335,6 +372,7 @@ p { text-wrap: pretty; }
   background: linear-gradient(120deg, var(--btn-from), var(--btn-to));
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 12px 32px -12px rgba(79, 70, 229, 0.65);
+}
 }
 
 /* Scrollbar */
@@ -357,4 +395,11 @@ textarea:-webkit-autofill {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+@layer components {
+/* Navbar before scrolling: lighter glass, no drop shadow */
+.nav-top {
+  box-shadow: inset 0 1px 0 var(--glass-highlight), inset 0 -1px 0 var(--glass-lowlight);
+}
 }

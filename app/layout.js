@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/lib/site";
 import Providers from "@/components/Providers";
 import GlassDefs from "@/components/GlassDefs";
+import Aurora from "@/components/Aurora";
 import { themeColors } from "@/lib/theme";
 import "./globals.css";
 
@@ -75,7 +76,14 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <body>
+        <a
+          href="#main"
+          className="glass-pill fixed left-4 top-4 z-[100] -translate-y-24 px-5 py-3 text-sm font-medium text-fg focus:translate-y-0"
+        >
+          Skip to content
+        </a>
         <GlassDefs />
+        <Aurora />
         <Providers>{children}</Providers>
         <Analytics />
       </body>

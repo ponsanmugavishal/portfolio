@@ -85,3 +85,13 @@ export function Magnetic({ children, className = "", strength = 0.3, ...props })
     </motion.a>
   );
 }
+
+// Softly pulsing accent dot used next to "Open to internships".
+export function StatusDot({ size = 10 }) {
+  return (
+    <span className="relative inline-flex shrink-0" style={{ width: size, height: size }} aria-hidden>
+      <span className="animate-ping-soft absolute inset-0 rounded-full bg-accent" />
+      <span className="relative inline-flex h-full w-full rounded-full bg-accent" />
+    </span>
+  );
+}
