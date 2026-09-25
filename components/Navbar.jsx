@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useLenis } from "lenis/react";
-import { Download, Menu, X } from "lucide-react";
+import { Download, Menu, Search, X } from "lucide-react";
 import { nav, site } from "@/lib/site";
 import { ease, spring, stagger } from "@/lib/motion";
 import ThemeToggle from "./ThemeToggle";
+import { OPEN_EVENT } from "./CommandPalette";
 
 function Logo() {
   return (
@@ -124,9 +125,13 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [isMac, setIsMac] = useState(false);
   const menuBtn = useRef(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    setIsMac(/mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || ""));
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -214,6 +219,18 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
+              aria-label="Open quick menu"
+              aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
+              className="glass-pill hidden h-10 items-center gap-2 pl-3 pr-2 text-sm text-muted transition hover:text-fg lg:inline-flex"
+            >
+              <Search size={15} aria-hidden />
+              <kbd className="rounded-md border border-line-strong px-1.5 py-0.5 font-mono text-[11px]">
+                {isMac ? "⌘K" : "Ctrl K"}
+              </kbd>
+            </button>
             <ThemeToggle />
             <a
               href={site.resume}

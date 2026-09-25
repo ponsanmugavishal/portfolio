@@ -45,6 +45,8 @@ export function scrollToTarget(lenis, target, hash) {
     focusEl?.focus({ preventScroll: true });
   };
   if (lenis) {
+    // A menu may have paused Lenis; restart it first, because start() cancels a running scroll
+    if (lenis.isStopped) lenis.start();
     lenis.scrollTo(toTop ? 0 : target, { force: true, onComplete: done });
   } else {
     const y = toTop ? 0 : target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;

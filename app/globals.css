@@ -334,32 +334,33 @@ html.supports-refraction .glass-refract {
 }
 
 /* ───────────── Base ───────────── */
-html {
-  scroll-padding-top: 96px;
-  -webkit-text-size-adjust: 100%;
-}
+@layer base {
+  html {
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  background: var(--page);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: 17px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: clip;
-}
+  body {
+    background: var(--page);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
 
-h1, h2, h3 { text-wrap: balance; }
-p { text-wrap: pretty; }
+  h1, h2, h3 { text-wrap: balance; }
+  p { text-wrap: pretty; }
 
-::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--fg); }
+  ::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--fg); }
 
-/* One focus style for every interactive element */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 6px var(--focus);
-  border-radius: 12px;
+  /* One focus style for every interactive element */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px var(--focus);
+  }
 }
 
 @layer components {
