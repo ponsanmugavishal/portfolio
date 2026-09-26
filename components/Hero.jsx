@@ -20,7 +20,7 @@ const chipLayout = [
 ];
 
 // The rotating last word. Its size is capped (.hero-rotating) so the longest phrase
-// fits on one line, and invisible copies reserve its width — no layout jumps.
+// fits on one line; the line is a full-width block, so there are no layout jumps.
 function RotatingWord({ words }) {
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -29,12 +29,7 @@ function RotatingWord({ words }) {
   }, [words.length]);
 
   return (
-    <span aria-hidden className="relative grid overflow-hidden whitespace-nowrap pb-[0.12em]">
-      {words.map((w) => (
-        <span key={w} className="invisible col-start-1 row-start-1">
-          {w}
-        </span>
-      ))}
+    <span className="relative grid overflow-hidden whitespace-nowrap pb-[0.12em]">
       <AnimatePresence initial={false}>
         <motion.span
           key={words[i]}
@@ -199,15 +194,15 @@ export default function Hero() {
               {site.status}
             </div>
 
-            <p className="text-label enter-fade mb-4 text-faint" style={{ "--d": "0.08s" }}>
-              {site.name}
-            </p>
-
             <h1 className="text-display text-fg">
-              <span className="sr-only">
-                Hi, I&apos;m {site.shortName}. I build {site.heroWords.join(" ")}
+              {/* Full name as real visible text in the h1 (helps name searches) */}
+              <span
+                className="text-label enter-fade mb-4 block font-normal leading-[1.6] text-faint"
+                style={{ "--d": "0.08s" }}
+              >
+                {site.name}
               </span>
-              <span aria-hidden className="block">
+              <span className="block">
                 {["Hi, I'm Vishal.", "I build"].map((line, li) => (
                   <span key={line} className="block overflow-hidden pb-[0.06em]">
                     <span className="enter-rise block" style={{ "--d": `${0.12 + li * 0.1}s` }}>

@@ -27,16 +27,20 @@ const jetbrains = localFont({
   preload: false, // only used for small labels, so it doesn't need to block the first paint
 });
 
+const title = `${site.name} | Portfolio – ${site.role}`;
 const description =
-  "Portfolio of Pon Sanmuga Vishal G — ECE student and aspiring software developer building with Python, Java, MySQL and LLM APIs.";
+  "Pon Sanmuga Vishal G — ECE student at M. Kumarasamy College of Engineering and aspiring software developer building with Python, Java, MySQL and LLM APIs. Portfolio, projects and contact.";
 
 export const metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.role}`,
+    default: title,
     template: `%s · ${site.name}`,
   },
   description,
+  alternates: { canonical: "/" },
+  // Set GOOGLE_SITE_VERIFICATION in Vercel to the code from Google Search Console
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
   keywords: [
     "Pon Sanmuga Vishal G",
     "Vishal portfolio",
@@ -52,14 +56,14 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: site.url,
-    title: `${site.name} — ${site.role}`,
+    title,
     description,
     siteName: site.name,
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — ${site.role}`,
+    title,
     description,
   },
   robots: { index: true, follow: true },
