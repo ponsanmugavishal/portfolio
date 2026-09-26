@@ -21,17 +21,29 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "Person",
     name: site.name,
+    alternateName: ["Pon Sanmuga Vishal", "Vishal G", "ponsanmugavishal"],
     url: site.url,
+    image: new URL(site.photo, site.url).href,
+    description: `${site.name} is an ECE student at ${site.college} and an aspiring software developer working with Python, Java, MySQL and LLM APIs.`,
     email: `mailto:${site.email}`,
     jobTitle: site.role,
-    alumniOf: "M. Kumarasamy College of Engineering",
+    knowsAbout: ["Python", "Java", "MySQL", "LLM APIs", "Web development"],
+    alumniOf: { "@type": "CollegeOrUniversity", name: site.college },
     address: { "@type": "PostalAddress", addressLocality: "Namakkal", addressRegion: "Tamil Nadu", addressCountry: "IN" },
     sameAs: site.socials.filter((s) => s.url.startsWith("http")).map((s) => s.url),
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: site.name,
+    url: site.url,
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <Navbar />
       <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero />
